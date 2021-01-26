@@ -1,0 +1,46 @@
+class Solution {
+public:
+void merge(vector<int>& nums, int start, int mid, int end)
+{
+    int n1 = (mid - start + 1);
+    int n2 = (end - mid);
+    int L[n1], R[n2];
+    for (int i = 0; i < n1; i++)
+        L[i] = nums[start + i];
+    for (int j = 0; j < n2; j++)
+        R[j] = nums[mid + 1 + j];
+    int i = 0, j = 0;
+    for (int k = start; k <= end; k++) {
+        if (j >= n2 || (i < n1 && L[i] <= R[j]))
+            nums[k] = L[i++];
+        else
+            nums[k] = R[j++];
+    }
+}
+int  mergeSort (vector< int >& nums, int l, int r){
+         if (l >= r) return  0 ;
+        
+        // 1. divide 
+        int mid = (l + r) / 2 , i = l, j = mid + 1 ;
+         int res = mergeSort (nums, l, mid) + mergeSort (nums, mid + 1 , r);     
+         // At this time, the front and rear halves are in order   
+        
+        // 2. conquer 
+        while (i <= mid && j <= r){
+             if (nums[i] <= ( long  long )nums[j] * 2 ) i++;
+             else {
+                res += (mid-i + 1 );
+                j++;
+            }
+        }
+        merge (nums, l, mid, r);
+         
+        return res;
+    }
+
+int reversePairs(vector<int>& nums)
+{
+    return  mergeSort(nums, 0, nums.size() - 1);
+}
+
+      };

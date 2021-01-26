@@ -1,0 +1,107 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+int lps[105];
+string s1,s2,pat;
+int dp[105][105][105];
+
+void build_lps()
+{
+    int M = pat.size();
+    int len = 0;
+    int i = 1;
+
+    while(i < M)
+    {
+        if(pat[i] == pat[len])
+            lps[i++] = ++len;
+        else
+        {
+            if(len) len = lps[len - 1];
+            else lps[i++] = 0;
+        }
+
+    }
+}
+
+int call(int i,int j,int k)
+{
+    if(k == pat.size()) return -1000;
+    if(i == s1.size() or j == s2.size()) return 0;
+    if(dp[i][j][k]!=-1) return dp[i][j][k];
+
+    int ret = -1000;
+
+    ret = max(ret,call(i+1,j,k));
+    ret = max(ret,call(i,j+1,k));
+
+
+    if(s1[i] == s2[j])
+    {
+        if(s1[i] == pat[k]) ret = max(ret,1 + call(i+1,j+1,k+1));
+        else
+        {
+            int nk = k;
+            while(pat[nk]!=s1[i] && nk>0)nk = lps[nk - 1];
+            if(s1[i] == pat[nk]) ret = max(ret,1 + call(i+1,j+1,nk+1));
+            else ret = max(ret, 1 + call(i+1,j+1,nk));
+        }
+
+
+
+    }
+
+
+    return dp[i][j][k] = ret;
+
+}
+
+void path_print(int i,int j,int k)
+{
+    if(k == pat.size()) return ;
+    if(i == s1.size() or j == s2.size()) return;
+
+    int ret = call(i,j,k);
+
+    if(ret == call(i+1,j,k)) path_print(i+1,j,k);
+    else if(ret == call(i,j+1,k)) path_print(i,j+1,k);
+
+
+
+    else if(s1[i] == s2[j])
+    {
+        cout<<s1[i];
+        if(s1[i] == pat[k]) path_print(i+1,j+1,k+1);
+        else
+        {
+            int nk = k;
+            while(pat[nk]!=s1[i] && nk>0)nk = lps[nk - 1];
+
+            if(s1[i] == pat[nk]) path_print(i+1,j+1,nk+1);
+            else path_print(i+1,j+1,nk);
+        }
+
+
+
+
+    }
+
+
+
+}
+
+
+int main()
+{
+    
+    memset(dp,-1,sizeof(dp));
+
+    cin>>s1>>s2>>pat;
+    build_lps();
+    int ans = call(0,0,0);
+    //cout<<ans<<endl;
+
+    if(ans)path_print(0,0,0);
+    else cout<<"0"<<endl;
+
+}
